@@ -74,7 +74,7 @@ kable(df1, format = "markdown")
 df2<-Scala_Solitudine %>%
   head(5)
 
-kable(df1, format = "markdown")
+kable(df2, format = "markdown")
 
 df3<-Sensazione_Sul_Dad %>%
   head(5)

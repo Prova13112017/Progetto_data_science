@@ -1,0 +1,1061 @@
+---
+title: "Analisi sulla ditatica a distanza degli studenti durante la pandemia"
+author: "JiaPing Huang"
+date: "28/1/2021"
+
+output:
+  html_document:
+    code_folding: hide
+    css: struttura.css
+    fig_width: 8
+    highlight: tango
+    theme: cosmo
+    toc: yes
+  pdf_document:
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+always_allow_html: yes
+editor_options: 
+  chunk_output_type: inline
+runtime: shiny
+---
+
+
+```{r,message=FALSE,warning=FALSE}
+#importo le librerie
+library(dplyr)
+library(tidyverse)
+library(tidytext)
+library(ggplot2)
+library(shiny)
+library(shinythemes)
+library(gridExtra)
+library(plotly)
+library(directlabels)
+library(utils)
+library(grid)
+library(knitr)
+```
+
+
+## Introduzione 
+  <h3>
+  Dopo l'imprevisto della crisi di pandemia nel 2019 ha cambiato la nostra vita quotidiana di tutto il mondo in vari ambiti ,uno dei quali che stiamo convivendo attualmente è la ditatica a distanza per tutti gli studenti.
+  <br>
+  In questo progetto analiziamo in vari aspetti interessanti degli studenti da 48 studenti in 10 settimane 
+  </h3>
+  <br><br>
+  <img src= "Dad_introduzione.jpg"/>
+<br><br><br>
+
+```{r,message=FALSE,warning=FALSE}
+##Importo del dataset
+
+#per darsi una autostima per la personalità
+AutoStima_Caratteristica=read.csv("BigFive.csv")
+#5 scelta tra fortemente accordo ,un po accordo ,ne accordo ne disaccordo ,un po non daccordo,fortemente disaccordo.
+
+Scala_Solitudine = read.csv("LonelinessScale.csv")
+#ogni colonna corrisponde a ogni domanda e ciascun utente puo rispondere 
+
+
+Sensazione_Sul_Dad= read.csv("panas.csv")
+#che sensazione abbia di fronte al DaD
+```
+
+Esempio di colonne di dataset:
+```{r ,echo= FALSE}
+df1<-AutoStima_Caratteristica %>%
+  head(5)
+
+kable(df1, format = "markdown")
+
+df2<-Scala_Solitudine %>%
+  head(5)
+
+kable(df1, format = "markdown")
+
+df3<-Sensazione_Sul_Dad %>%
+  head(5)
+
+kable(df3, format = "markdown")
+```
+
+Esempio di colonne di dataset:
+```{r,message=FALSE,warning=FALSE}
+cerca_domanda <- function(num){
+  testo_manipulation<-colnames(AutoStima_Caratteristica[,3:46] )
+  str_replace_all(testo_manipulation,"[.]","")
+  gsub("^.*?\\d",num,testo_manipulation[num])
+}
+x1<-cerca_domanda(1)
+x2<-cerca_domanda(2)
+x3<-cerca_domanda(3)
+
+kable(x1,format = "markdown")
+kable(x2,format = "markdown")
+kable(x3,format = "markdown")
+
+
+#estrae dalla tabella la prima domanda e contare quante valutazione sono in totale prima di prova 
+AutoStima_Caratteristica_Questione1_pre = AutoStima_Caratteristica %>%                       
+  select(1,2,3) %>% 
+  filter(type=="pre")%>%
+  group_by_at(3)%>%#seleziona il numero della colonna a posto di nome(sono lunghi)
+  summarise(totale=n())
+
+#estrae dalla tabella la prima domanda e contare quante valutazione sono in totale dopo di prova
+AutoStima_Caratteristica_Questione1_post = AutoStima_Caratteristica %>% 
+  select(1,2,3) %>%                                    
+  filter(type=="post")%>%
+  group_by_at(3)%>%#seleziona il numero della colonna a posto di nome(sono lunghi)
+  summarise(totale=n())
+
+#sostituisce in italiano 
+colnames(AutoStima_Caratteristica_Questione1_pre) <- c("Sono_chiacchierone_prima","totale")
+colnames(AutoStima_Caratteristica_Questione1_post) <- c("Sono_chiacchierone_dopo","totale")
+
+#domanda 2
+AutoStima_Caratteristica_Questione2_pre = AutoStima_Caratteristica %>% 
+  select(1,2,4) %>% 
+  filter(type=="pre")%>%
+  group_by_at(3)%>%
+  summarise(totale=n())
+
+AutoStima_Caratteristica_Questione2_post = AutoStima_Caratteristica %>%
+  select(1,2,4) %>% 
+  filter(type=="post")%>%
+  group_by_at(3)%>% #seleziona il numero della colonna a posto di nome(sono lunghi)
+  summarise(totale=n())
+
+colnames(AutoStima_Caratteristica_Questione2_pre) <- c("tende_di_andare_in_fallimenti_con_altri_prima","totale")
+colnames(AutoStima_Caratteristica_Questione2_post) <- c("tende_di_andare_in_fallimenti_con_altri_dopo","totale")
+
+#domanda 11
+
+AutoStima_Caratteristica_Questione11_pre = AutoStima_Caratteristica %>% 
+  select(1,2,13) %>% 
+  filter(type=="pre")%>%
+  group_by_at(3)%>%
+  summarise(totale=n())
+
+AutoStima_Caratteristica_Questione11_post = AutoStima_Caratteristica %>%
+  select(1,2,13) %>% 
+  filter(type=="post")%>%
+  group_by_at(3)%>% #seleziona il numero della colonna a posto di nome(sono lunghi)
+  summarise(totale=n())
+
+colnames(AutoStima_Caratteristica_Questione11_pre) <- c("se_sei_energetico_prima","totale")
+colnames(AutoStima_Caratteristica_Questione11_post) <- c("se_sei_energetico_dopo","totale")
+
+#domanda 19
+
+AutoStima_Caratteristica_Questione19_pre = AutoStima_Caratteristica %>% 
+  select(1,2,19) %>% 
+  filter(type=="pre")%>%
+  group_by_at(3)%>%
+  summarise(totale=n())
+
+AutoStima_Caratteristica_Questione19_post = AutoStima_Caratteristica %>%
+  select(1,2,19) %>% 
+  filter(type=="post")%>%
+  group_by_at(3)%>% #seleziona il numero della colonna a posto di nome(sono lunghi)
+  summarise(totale=n())
+
+colnames(AutoStima_Caratteristica_Questione19_pre) <- c("se_sei_preocupato_tanto_prima","totale")
+colnames(AutoStima_Caratteristica_Questione19_post) <- c("se_sei_preocupato_tanto_dopo","totale")
+
+#domanda 23
+
+AutoStima_Caratteristica_Questione23_pre = AutoStima_Caratteristica %>% 
+  select(1,2,23) %>% 
+  filter(type=="pre")%>%
+  group_by_at(3)%>%
+  summarise(totale=n())
+
+AutoStima_Caratteristica_Questione23_post = AutoStima_Caratteristica %>%
+  select(1,2,23) %>% 
+  filter(type=="post")%>%
+  group_by_at(3)%>% #seleziona il numero della colonna a posto di nome(sono lunghi)
+  summarise(totale=n())
+
+colnames(AutoStima_Caratteristica_Questione23_pre) <- c("tende_a_diventare_pigro_prima","totale")
+colnames(AutoStima_Caratteristica_Questione23_post) <- c("tende_a_diventare_pigro_dopo","totale")
+
+
+
+#preparazione per il grafico a barre
+
+#estrazione 
+q1_pre<-AutoStima_Caratteristica_Questione1_pre[,2]
+q1_post<-AutoStima_Caratteristica_Questione1_post[,2]
+q2_pre<-AutoStima_Caratteristica_Questione2_pre[,2]
+q2_post<-AutoStima_Caratteristica_Questione2_post[,2]
+q11_pre<-AutoStima_Caratteristica_Questione11_pre[,2]
+q11_post<-AutoStima_Caratteristica_Questione11_post[,2]
+q19_pre<-AutoStima_Caratteristica_Questione19_pre[,2]
+q19_post<-AutoStima_Caratteristica_Questione19_post[,2]
+q23_pre<-AutoStima_Caratteristica_Questione23_pre[,2]
+q23_post<-AutoStima_Caratteristica_Questione23_post[,2]
+
+domande<-c("Sono_chiacchierone_prima","Sono_chiacchierone_dopo","tende_di_andare_in_fallimenti_con_altri_prima","tende_di_andare_in_fallimenti_con_altri_dopo",
+           "se_sei_energetico_prima","se_sei_energetico_dopo","se_sei_preocupato_tanto_prima","se_sei_preocupato_tanto_dopo","tende_a_diventare_pigro_prima",
+           "tende_a_diventare_pigro_dopo"
+           )
+
+q11_pre=q11_pre %>%
+  mutate(indice=1:4)
+q11_post=q11_post %>%
+  mutate(indice=1:5)
+x<-right_join(q11_pre,q11_post,by=c("indice"))
+x$indice<-NULL
+
+nuovaTabella<-data.frame(q1_pre,q1_post,q2_pre,q2_post,x,q19_pre,q19_post,q23_pre,q23_post)
+nuovaTabella<-t(nuovaTabella)
+
+colnames(nuovaTabella)<-c("Agree_a_little","Agree_strongly","Disagree_a_little","Disagree_Strongly","Neither_agree_nor_disagree")
+nuovaTabella<-data.frame(domanda=domande,nuovaTabella,stringsAsFactors = FALSE)
+
+
+ kable(nuovaTabella,format = "markdown")
+  
+#•La tabella funziona a metà  
+  nuovaTabella %>%
+    gather(Agree_a_little,Agree_strongly,Disagree_a_little,Disagree_Strongly,Neither_agree_nor_disagree,key ="emoji",value =tot) %>%
+    ggplot(aes(x=reorder(domanda,tot),y=tot,fill=emoji))+
+     geom_bar(stat="identity")+
+     geom_text(aes(label=tot),position = position_stack(vjust = 0.5))+
+    coord_flip()+
+     scale_fill_manual("Valutazione",values = c("Agree_a_little"="#D6AF36","Agree_strongly"="#A7A7AD","Disagree_a_little"="#A77044","Disagree_Strongly"=                        "#ADD8E6","Neither_agree_nor_disagree"="#7FFFD4"))+
+   theme(axis.title.y=element_blank(),
+            panel.background=element_blank(),
+            legend.position = "none")+
+     labs(title="Valutazione per autostima",y="totale")
+ 
+  
+```
+
+<br><br><br>
+Che sensazione hanno durante l'esperienza di ditatica a distanza
+```{r ,echo= FALSE}
+Sensazione_Sul_Dad_prima=Sensazione_Sul_Dad %>%
+                          filter(type=="pre") 
+
+Sensazione_Sul_Dad_dopo=Sensazione_Sul_Dad %>%
+                          filter(type=="post")
+  
+#1
+  #contare quante sono le persone che interessano prima di provare la ditatica a distanza 
+  risultato_interesting_1= Sensazione_Sul_Dad_prima %>%
+    group_by(Interested)%>%
+    summarise(count=n()) %>%
+   filter(count<100)%>%
+    mutate(type="pre")%>%
+    arrange(desc(Interested))
+  
+  
+  kable(risultato_interesting_1,format = "markdown")
+  
+  
+  #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+  risultato_interesting_2= Sensazione_Sul_Dad_dopo %>%
+    group_by(Interested)%>%
+    summarise(count=n()) %>%
+   filter(count<100)%>%
+     mutate(type="post")%>%
+    arrange(desc(Interested))
+
+  kable(risultato_interesting_2,format = "markdown")
+ 
+  #Strong,Guilty,Scared,Hostile,Enthusiastic,Proud,Irritable,Alert,Inspired,Nervous,Determined,Attentive,Jittery,Active,Afraid
+
+```
+
+
+## Emozioni durante la fase di DaD:{.tabset .tabset-fade .tabset-pills}
+
+```{r,message=FALSE,warning=FALSE,out.width="100%"}
+
+ui<-fluidPage(theme = shinytheme("cerulean"),
+       navbarPage(
+         "Valutazione prima e dopo della ditatica a distanza",
+         tabPanel("Positivo",
+                  sidebarPanel(
+                    selectInput("EmozioneSelezionato","Input:",c("Interested","Active","Enthusiastic")),
+                  ),
+                  mainPanel(
+                    h1("Risultato"),
+                    verbatimTextOutput("EmozioneSelezionato"),
+                      plotOutput("risultatoPosPlot")
+                  )
+          ),
+          tabPanel("Negativo",
+                  sidebarPanel(
+                    selectInput("EmozioneSelezionato2","Input:",c("Upset","Distressed","Scared")),
+                  ),
+                  mainPanel(
+                    h1("Risultato"),
+                    verbatimTextOutput("EmozioneSelezionato2"),
+                      plotOutput("risultatoNegPlot")
+                  )
+          ),
+          tabPanel("Differenza",
+                  sidebarPanel(
+                    radioButtons("inputRadioButton","Scelta :",c("Active","Interested","Enthusiastic")),
+                  mainPanel(h1("Risultato"),tableOutput("tabellaDiConfronto"))
+                  )
+          )
+       )
+)#fluidPage
+
+server <- function(input, output,session) {
+  Sensazione_Sul_Dad= read.csv("panas.csv")
+  Sensazione_Sul_Dad_prima=Sensazione_Sul_Dad %>%
+                            filter(type=="pre") 
+  Sensazione_Sul_Dad_dopo=Sensazione_Sul_Dad %>%
+                            filter(type=="post")
+    
+  cdata <- session$clientData
+  
+ 
+  emozionePositive <- eventReactive(input$EmozioneSelezionato,{
+    if(input$EmozioneSelezionato == "Interested"){
+          #contare quante sono le persone che interessano prima di provare la ditatica a distanza 
+          risultato_interesting_1= Sensazione_Sul_Dad_prima %>%
+            group_by(Interested)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+            mutate(type="pre")%>%
+            arrange(desc(Interested))
+          
+          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+          risultato_interesting_2= Sensazione_Sul_Dad_dopo %>%
+            group_by(Interested)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+             mutate(type="post")%>%
+            arrange(desc(Interested))
+        
+         preparazione_table= bind_rows(risultato_interesting_1,risultato_interesting_2)
+         
+        graffico_positivo_1=ggplot(data=preparazione_table, aes(x=Interested,y=count,fill=type))+
+          geom_bar(stat="identity", position=position_dodge())+
+          geom_text(aes(label=count), vjust=1.6, color="white",position = position_dodge(0.9), size=3.5)+
+           scale_fill_brewer(palette="Paired")+
+          labs(title="Interesting pre and post")+
+          theme_minimal()
+        graffico_positivo_1
+        
+    }else if(input$EmozioneSelezionato=="Active"){
+        risultato_active_1= Sensazione_Sul_Dad_prima %>%
+            group_by(Active)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+            mutate(type="pre")%>%
+            arrange(desc(Active))
+          
+          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+          risultato_active_2= Sensazione_Sul_Dad_dopo %>%
+            group_by(Active)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+             mutate(type="post")%>%
+            arrange(desc(Active))
+        
+         preparazione_table= bind_rows(risultato_active_1,risultato_active_2)
+         
+        graffico_positivo_2=ggplot(data=preparazione_table, aes(x=Active,y=count,fill=type))+
+          geom_bar(stat="identity", position=position_dodge())+
+          geom_text(aes(label=count), vjust=1.6, color="white",position = position_dodge(0.9), size=3.5)+
+           scale_fill_brewer(palette="Paired")+
+          labs(title="Interesting pre and post")+
+          theme_minimal()
+        graffico_positivo_2
+    }else{
+      risultato_enthusiastic_1= Sensazione_Sul_Dad_prima %>%
+            group_by(Enthusiastic)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+            mutate(type="pre")%>%
+            arrange(desc(Enthusiastic))
+          
+          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+          risultato_enthusiastic_2= Sensazione_Sul_Dad_dopo %>%
+            group_by(Enthusiastic)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+             mutate(type="post")%>%
+            arrange(desc(Enthusiastic))
+        
+         preparazione_table= bind_rows(risultato_enthusiastic_1,risultato_enthusiastic_2)
+         
+        graffico_positivo_3=ggplot(data=preparazione_table, aes(x=Enthusiastic,y=count,fill=type))+
+          geom_bar(stat="identity", position=position_dodge())+
+          geom_text(aes(label=count), vjust=1.6, color="white",position = position_dodge(0.9), size=3.5)+
+           scale_fill_brewer(palette="Paired")+
+          labs(title="Interesting pre and post")+
+          theme_minimal()
+        graffico_positivo_3
+    }
+  })
+  
+  emozioneNegative <- eventReactive(input$EmozioneSelezionato2,{
+    if(input$EmozioneSelezionato2 == "Scared"){
+          #contare quante sono le persone che interessano prima di provare la ditatica a distanza 
+          risultato_scared_1= Sensazione_Sul_Dad_prima %>%
+            group_by(Scared)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+            mutate(type="pre")%>%
+            arrange(desc(Scared))
+          
+          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+          risultato_scared_2= Sensazione_Sul_Dad_dopo %>%
+            group_by(Scared)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+             mutate(type="post")%>%
+            arrange(desc(Scared))
+        
+         preparazione_table= bind_rows(risultato_scared_1,risultato_scared_2)
+         
+        graffico_negativo_1=ggplot(data=preparazione_table, aes(x=Scared,y=count,fill=type))+
+          geom_bar(stat="identity", position=position_dodge())+
+          geom_text(aes(label=count), vjust=1.6, color="white",position = position_dodge(0.9), size=3.5)+
+           scale_fill_brewer(palette="Paired")+
+          labs(title="Scared pre and post")+
+          theme_minimal()
+        
+      graffico_negativo_1        
+    }else if(input$EmozioneSelezionato2=="Upset"){
+        risultato_upset_1= Sensazione_Sul_Dad_prima %>%
+            group_by(Upset)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+            mutate(type="pre")%>%
+            arrange(desc(Upset))
+          
+          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+          risultato_upset_2= Sensazione_Sul_Dad_dopo %>%
+            group_by(Upset)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+             mutate(type="post")%>%
+            arrange(desc(Upset))
+        
+         preparazione_table= bind_rows(risultato_upset_1,risultato_upset_2)
+         
+        graffico_negativo_2=ggplot(data=preparazione_table, aes(x=Upset,y=count,fill=type))+
+          geom_bar(stat="identity", position=position_dodge())+
+          geom_text(aes(label=count), vjust=1.6, color="white",position = position_dodge(0.9), size=3.5)+
+           scale_fill_brewer(palette="Paired")+
+          labs(title="Upset pre and post")+
+          theme_minimal()
+        graffico_negativo_2
+    }else{
+      risultato_distressed_1= Sensazione_Sul_Dad_prima %>%
+            group_by(Distressed)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+            mutate(type="pre")%>%
+            arrange(desc(Distressed))
+          
+          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+          risultato_distressed_2= Sensazione_Sul_Dad_dopo %>%
+            group_by(Distressed)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+             mutate(type="post")%>%
+            arrange(desc(Distressed))
+        
+         preparazione_table= bind_rows(risultato_distressed_1,risultato_distressed_2)
+         
+        graffico_negativo_3=ggplot(data=preparazione_table, aes(x=Distressed,y=count,fill=type))+
+          geom_bar(stat="identity", position=position_dodge())+
+          geom_text(aes(label=count), vjust=1.6, color="white",position = position_dodge(0.9), size=3.5)+
+           scale_fill_brewer(palette="Paired")+
+          labs(title="Distressed pre and post")+
+          theme_minimal()
+        graffico_negativo_3
+    }
+  })
+  
+      differenza <- function(valutazione_prima_di_provare,valutazione_dopo_di_provare){
+          if(valutazione_prima_di_provare==valutazione_dopo_di_provare){
+            return(0)
+          }else{
+            if(valutazione_prima_di_provare>valutazione_dopo_di_provare){
+              risultato1 = valutazione_prima_di_provare - valutazione_dopo_di_provare
+              return(risultato1)
+            }else{
+              risultato2 = valutazione_dopo_di_provare-valutazione_prima_di_provare
+               return(risultato2)
+            }
+          }
+        }
+    tendenza <- function(valutazione_prima_di_provare,valutazione_dopo_di_provare){
+        if(valutazione_prima_di_provare==valutazione_dopo_di_provare){
+          return("non cambia")
+        }
+          if(valutazione_prima_di_provare>valutazione_dopo_di_provare){
+            return("diminuiti")
+          }else{
+             return("aumentati")
+          }
+        }
+      
+  tabella <- eventReactive(input$inputRadioButton,{
+    if(input$inputRadioButton == ""){
+      return ();
+    }else{
+      if(input$inputRadioButton == "Interested"){
+       #contare quante sono le persone che interessano prima di provare la ditatica a distanza
+          risultato_interesting_1= Sensazione_Sul_Dad_prima %>%
+            group_by(Interested)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+            mutate(type="pre")%>%
+            arrange(desc(Interested))
+
+          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza
+          risultato_interesting_2= Sensazione_Sul_Dad_dopo %>%
+            group_by(Interested)%>%
+            summarise(count=n()) %>%
+           filter(count<100)%>%
+             mutate(type="post")%>%
+            arrange(desc(Interested))
+          
+        riassunto1=full_join(risultato_interesting_1,risultato_interesting_2,by=c("Interested"="Interested")) %>%
+             mutate( tendenza = tendenza(count.x,count.y),differenza=differenza(count.x,count.y))%>%
+             rename( Interessa_prima_di=count.x,
+                     Interessa_dopo_di=count.y)
+        
+       return ( riassunto1)
+
+        }else{
+          if(input$inputRadioButton == "Active"){
+          #contare quante sono le persone che interessano prima di provare la ditatica a distanza
+            risultato_active_1= Sensazione_Sul_Dad_prima %>%
+              group_by(Active)%>%
+              summarise(count=n()) %>%
+             filter(count<100)%>%
+              mutate(type="pre")%>%
+              arrange(desc(Active))
+
+            #quante persone invece hanno valutato dopo aver provato la ditatica a distanza
+            risultato_active_2= Sensazione_Sul_Dad_dopo %>%
+              group_by(Active)%>%
+              summarise(count=n()) %>%
+             filter(count<100)%>%
+               mutate(type="post")%>%
+              arrange(desc(Active))
+
+              riassunto2=full_join(risultato_active_1,risultato_active_2,by=c("Active"="Active")) %>%
+                   mutate( tendenza = tendenza(count.x,count.y),differenza=differenza(count.x,count.y))%>%
+                   rename( Attivo_prima_di=count.x,
+                           Attivo_dopo_di=count.y)
+              return (riassunto2)
+          }else{
+              if(input$inputRadioButton=="Enthusiastic"){
+                #contare quante sono le persone che interessano prima di provare la ditatica a distanza
+                risultato_enthusiastic_1= Sensazione_Sul_Dad_prima %>%
+                  group_by(Enthusiastic)%>%
+                  summarise(count=n()) %>%
+                 filter(count<100)%>%
+                  mutate(type="pre")%>%
+                  arrange(desc(Enthusiastic))
+  
+                #quante persone invece hanno valutato dopo aver provato la ditatica a distanza
+                risultato_enthusiastic_2= Sensazione_Sul_Dad_dopo %>%
+                  group_by(Enthusiastic)%>%
+                  summarise(count=n()) %>%
+                 filter(count<100)%>%
+                   mutate(type="post")%>%
+                  arrange(desc(Enthusiastic))
+
+riassunto3=full_join(risultato_enthusiastic_1,risultato_enthusiastic_2,by=c("Enthusiastic"="Enthusiastic")) %>%
+                   mutate( tendenza = tendenza(count.x,count.y),differenza=differenza(count.x,count.y))%>%
+                   rename( entusiastico_prima_di=count.x,
+                           entusiastico_dopo_di=count.y)
+                return (riassunto3)
+              }
+          }
+        }
+    }
+
+  })
+   output$textout<- renderText({
+    paste(input$EmozioneSelezionato)
+  })
+
+  output$risultatoPosPlot<- renderPlot({
+      emozionePositive()
+    })
+  output$risultatoNegPlot<- renderPlot({
+      emozioneNegative()
+    })
+   output$tabellaDiConfronto<-renderTable({
+     tabella()
+    })
+  
+}#server
+
+shinyApp(ui = ui, server = server)
+
+```
+
+<br><br><br>
+```{r ,echo= FALSE}
+#manipolazione della tabella di solitudine
+
+ #persone prima dell'esperienza come valutano per eventuali requesiti
+  Scala_Solitudine_pre <- Scala_Solitudine %>%
+    filter(type=="pre")
+  
+  #persone dopo dell'esperienza come valutano per eventuali requesiti  
+  Scala_Solitudine_post <- Scala_Solitudine %>%
+      filter(type=="post")
+    
+  #raccoltà per ogni domande 
+  s1<-Scala_Solitudine_pre %>%
+    group_by(X1..I.feel.in.tune.with.the.people.around.me)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s2<-Scala_Solitudine_pre %>%
+    group_by(X2..I.lack.companionship)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s3<-Scala_Solitudine_pre %>%
+    group_by(X3..There.is.no.one.I.can.turn.to)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s4<-Scala_Solitudine_pre %>%
+    group_by(X4..I.do.not.feel.alone)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s5<-Scala_Solitudine_pre %>%
+    group_by(X5..I.feel.part.of.a.group.of.friends)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s6<-Scala_Solitudine_pre %>%
+    group_by(X6..I.have.a.lot.in.common.with.the.people.around.me)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s7<-Scala_Solitudine_pre %>%
+    group_by(X7..I.am.no.longer.close.to.anyone)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s8<-Scala_Solitudine_pre %>%
+    group_by(X8..My.interests.and.ideas.are.not.shared.by.those.around.me)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s9<-Scala_Solitudine_pre %>%
+    group_by(X9..I.am.an.outgoing.person)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s10<-Scala_Solitudine_pre %>%
+    group_by(X10..There.are.people.I.feel.close.to)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s11<-Scala_Solitudine_pre %>%
+    group_by(X11..I.feel.left.out)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s12<-Scala_Solitudine_pre %>%
+    group_by(X12..My.social.relationships.are.superficial)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s13<-Scala_Solitudine_pre %>%
+    group_by(X13..No.one.really.knows.me.well)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s14<-Scala_Solitudine_pre %>%
+    group_by(X14..I.feel.isolated.from.others)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s15<-Scala_Solitudine_pre %>%
+    group_by(X15..I.can.find.companionship.when.I.want.it)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s16<-Scala_Solitudine_pre %>%
+    group_by(X16..There.are.people.who.really.understand.me)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s17<-Scala_Solitudine_pre %>%
+    group_by(X17..I.am.unhappy.being.so.withdrawn)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s18<-Scala_Solitudine_pre %>%
+    group_by(X18..People.are.around.me.but.not.with.me)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s19<-Scala_Solitudine_pre %>%
+    group_by(X19..There.are.people.I.can.talk.to)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  s20<-Scala_Solitudine_pre %>%
+    group_by(X20..There.are.people.I.can.turn.to)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  #raccoltà per ogni domande post covid
+  p1<-Scala_Solitudine_post %>%
+    group_by(X1..I.feel.in.tune.with.the.people.around.me)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p2<-Scala_Solitudine_post %>%
+    group_by(X2..I.lack.companionship)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p3<-Scala_Solitudine_post %>%
+    group_by(X3..There.is.no.one.I.can.turn.to)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p4<-Scala_Solitudine_post %>%
+    group_by(X4..I.do.not.feel.alone)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p5<-Scala_Solitudine_post %>%
+    group_by(X5..I.feel.part.of.a.group.of.friends)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p6<-Scala_Solitudine_post %>%
+    group_by(X6..I.have.a.lot.in.common.with.the.people.around.me)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p7<-Scala_Solitudine_post %>%
+    group_by(X7..I.am.no.longer.close.to.anyone)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p8<-Scala_Solitudine_post %>%
+    group_by(X8..My.interests.and.ideas.are.not.shared.by.those.around.me)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p9<-Scala_Solitudine_post %>%
+    group_by(X9..I.am.an.outgoing.person)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p10<-Scala_Solitudine_post %>%
+    group_by(X10..There.are.people.I.feel.close.to)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p11<-Scala_Solitudine_post %>%
+    group_by(X11..I.feel.left.out)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p12<-Scala_Solitudine_post %>%
+    group_by(X12..My.social.relationships.are.superficial)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p13<-Scala_Solitudine_post %>%
+    group_by(X13..No.one.really.knows.me.well)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p14<-Scala_Solitudine_post %>%
+    group_by(X14..I.feel.isolated.from.others)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p15<-Scala_Solitudine_post %>%
+    group_by(X15..I.can.find.companionship.when.I.want.it)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p16<-Scala_Solitudine_post %>%
+    group_by(X16..There.are.people.who.really.understand.me)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p17<-Scala_Solitudine_post %>%
+    group_by(X17..I.am.unhappy.being.so.withdrawn)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p18<-Scala_Solitudine_post %>%
+    group_by(X18..People.are.around.me.but.not.with.me)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p19<-Scala_Solitudine_post %>%
+    group_by(X19..There.are.people.I.can.talk.to)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  p20<-Scala_Solitudine_post %>%
+    group_by(X20..There.are.people.I.can.turn.to)%>%
+    summarise(count=n()) %>%
+    arrange(desc(count))
+  
+  colonna<-c("Often","Sometimes","Rarely","Never")
+  Often<-c(rep(0,20))
+  Rarely<-c(rep(0,20))
+  Sometimes<-c(rep(0,20))
+  Never<-c(rep(0,20))
+
+  nuovaTabella_soli<-data.frame(Often,Rarely,Sometimes,Never)
+  nuovaTabella_soli_post<-data.frame(Often,Rarely,Sometimes,Never)
+
+  num_requisito<-function(stringa){
+    #RETURN intero
+    #elaborazione specifica mi restituisce un numero specifico dalla stringa casuale
+     stringa= str_extract(stringa,"X\\d.")
+     risultato=str_extract(stringa,"\\d.")
+     risultato=as.integer(risultato)
+    if(is.integer(risultato)){
+      return(risultato)
+    }else{
+      stringa= str_extract(stringa,"X\\d")
+      risultato=str_extract(stringa,"\\d")
+      return (as.integer(risultato))
+    }
+  }
+  
+  #text mining
+  numero_requisito<-num_requisito("X1..There.are.people.who.really.understand.me")
+  numero_requisito2<-num_requisito("X2..")
+  numero_requisito10<-num_requisito("X10..")
+
+ 
+  sostituzione_pre <- function(table,numero_requisito){
+    #RETURN list
+    #passaggio da 20 tabelle in un unica tabella sommario
+    dimensione<-dim.data.frame(table$count)
+    dimensione<-dimensione[2]#trova la dimensione per ogni singola tabella(sono a loro volta diversi)
+    
+      for(i in 1:dimensione){ #trovare per ogni riga fino alla fine se 
+        if(as.character(table[i,1]) == "Often" && numero_requisito == num_requisito(colnames(table[1]))){ #trova se c'è una corrispondenza nella tabellina e se il numero della domanda sono gli stessi, se si posso mettere nella cella corrispondente
+          nuovaTabella_soli[numero_requisito,i]<-table$count[i] #passa valore 
+        }else if (as.character(table[i,1])=="Sometimes" &&  numero_requisito==num_requisito(colnames(table[1]))){
+           nuovaTabella_soli[numero_requisito,i]<-table$count[i]#
+        }else if(as.character(table[i,1])=="Rarely" && numero_requisito == num_requisito(colnames(table[1]))){
+           nuovaTabella_soli[numero_requisito,i]<-table$count[i]
+        }else if(as.character(table[i,1])=="Never" && numero_requisito == num_requisito(colnames(table[1]))){ 
+            nuovaTabella_soli[numero_requisito,i]<-table$count[i]
+        }
+      }
+    return(nuovaTabella_soli)
+  }
+
+  nuovaTabella_soli<-sostituzione_pre(s1,numero_requisito)
+  nuovaTabella_soli<-sostituzione_pre(s2,numero_requisito2)
+  nuovaTabella_soli<-sostituzione_pre(s3,3)
+  nuovaTabella_soli<-sostituzione_pre(s4,4)
+  nuovaTabella_soli<-sostituzione_pre(s5,5)
+  nuovaTabella_soli<-sostituzione_pre(s6,6)
+  nuovaTabella_soli<-sostituzione_pre(s7,7)
+  nuovaTabella_soli<-sostituzione_pre(s8,8)
+  nuovaTabella_soli<-sostituzione_pre(s9,9)
+  nuovaTabella_soli<-sostituzione_pre(s10,numero_requisito10)
+  nuovaTabella_soli<-sostituzione_pre(s11,11)
+  nuovaTabella_soli<-sostituzione_pre(s12,12)
+  nuovaTabella_soli<-sostituzione_pre(s13,13)
+  nuovaTabella_soli<-sostituzione_pre(s14,14)
+  nuovaTabella_soli<-sostituzione_pre(s15,15)
+  nuovaTabella_soli<-sostituzione_pre(s16,16)
+  nuovaTabella_soli<-sostituzione_pre(s17,17)
+  nuovaTabella_soli<-sostituzione_pre(s18,18)
+  nuovaTabella_soli<-sostituzione_pre(s19,19)
+  nuovaTabella_soli<-sostituzione_pre(s20,20)
+
+  sostituzione_post <- function(table,numero_requisito){
+    #RETURN list
+    #passaggio da 20 tabelle in un unica tabella sommario
+    dimensione<-dim.data.frame(table$count)
+    dimensione<-dimensione[2]
+      for(i in 1:dimensione){
+        if(as.character(table[i,1]) == "Often" && numero_requisito == num_requisito(colnames(table[1]))){ 
+          nuovaTabella_soli_post[numero_requisito,i]<-table$count[i]  
+        }else if (as.character(table[i,1])=="Sometimes" &&  numero_requisito==num_requisito(colnames(table[1]))){
+           nuovaTabella_soli_post[numero_requisito,i]<-table$count[i]#
+        }else if(as.character(table[i,1])=="Rarely" && numero_requisito == num_requisito(colnames(table[1]))){
+           nuovaTabella_soli_post[numero_requisito,i]<-table$count[i]
+        }else if(as.character(table[i,1])=="Never" && numero_requisito == num_requisito(colnames(table[1]))){ 
+            nuovaTabella_soli_post[numero_requisito,i]<-table$count[i]
+        }
+      }
+    return(nuovaTabella_soli_post)
+  }
+  nuovaTabella_soli_post<-sostituzione_post(p1,numero_requisito)
+  nuovaTabella_soli_post<-sostituzione_post(p2,numero_requisito2)
+  nuovaTabella_soli_post<-sostituzione_post(p3,3)
+  nuovaTabella_soli_post<-sostituzione_post(p4,4)
+  nuovaTabella_soli_post<-sostituzione_post(p5,5)
+  nuovaTabella_soli_post<-sostituzione_post(p6,6)
+  nuovaTabella_soli_post<-sostituzione_post(p7,7)
+  nuovaTabella_soli_post<-sostituzione_post(p8,8)
+  nuovaTabella_soli_post<-sostituzione_post(p9,9)
+  nuovaTabella_soli_post<-sostituzione_post(p10,numero_requisito10)
+  nuovaTabella_soli_post<-sostituzione_post(p11,11)
+  nuovaTabella_soli_post<-sostituzione_post(p12,12)
+  nuovaTabella_soli_post<-sostituzione_post(p13,13)
+  nuovaTabella_soli_post<-sostituzione_post(p14,14)
+  nuovaTabella_soli_post<-sostituzione_post(p15,15)
+  nuovaTabella_soli_post<-sostituzione_post(p16,16)
+  nuovaTabella_soli_post<-sostituzione_post(p17,17)
+  nuovaTabella_soli_post<-sostituzione_post(p18,18)
+  nuovaTabella_soli_post<-sostituzione_post(p19,19)
+  nuovaTabella_soli_post<-sostituzione_post(p20,20)
+  
+  indice<-c(rep(1:20,4))
+  frequenza<-c(rep("often",20),rep("sometimes",20),rep("rarely",20),rep("never",20))
+  numero<-c(rep(0,80))
+  preparazione_grafico=data.frame(indice,frequenza,numero)
+  preparazione_grafico_post=data.frame(indice,frequenza,numero)
+  
+  
+  preparazione_grafico[1:20,3] <- nuovaTabella_soli[1:20,1]
+  preparazione_grafico[21:40,3] <- nuovaTabella_soli[1:20,2]
+  preparazione_grafico[41:60,3] <- nuovaTabella_soli[1:20,3]
+  preparazione_grafico[61:80,3] <- nuovaTabella_soli[1:20,4]
+  
+  preparazione_grafico_post[1:20,3] <- nuovaTabella_soli_post[1:20,1]
+  preparazione_grafico_post[21:40,3] <- nuovaTabella_soli_post[1:20,2]
+  preparazione_grafico_post[41:60,3] <- nuovaTabella_soli_post[1:20,3]
+  preparazione_grafico_post[61:80,3] <- nuovaTabella_soli_post[1:20,4]  
+  
+  grafico_Solitudine<-preparazione_grafico%>%
+    ggplot(aes(x=indice,numero,fill=frequenza))+
+    geom_bar(stat="identity",position = position_dodge())+
+    scale_fill_manual("Frequenza", values = c( "often" = "#D6AF36", "sometimes" = "#A7A7AD","rarely" = "#A77044","never"= 	"#000000"))+
+     theme(axis.title=element_blank())+
+    labs(title="Frequenza per solitudine pre")
+  
+  grafico_Solitudine_post<-preparazione_grafico_post%>%
+    ggplot(aes(x=indice,numero,fill=frequenza))+
+    geom_bar(stat="identity",position = position_dodge())+
+    scale_fill_manual("Frequenza", values = c( "often" = "#D6AF36", "sometimes" = "#A7A7AD","rarely" = "#A77044","never"= 	"#000000"))+
+     theme(axis.title=element_blank())+
+    labs(title="Frequenza per solitudine post")
+  
+  grid.arrange(grafico_Solitudine,grafico_Solitudine_post)
+```
+
+
+## Scala di solitudine:{.tabset .tabset-fade .tabset-pills}
+
+```{r ,echo= FALSE}
+ 
+ui<-fluidPage(theme = shinytheme("superhero"),
+        navbarPage(
+         "Valutazione prima e dopo della ditatica a distanza",
+         tabPanel("Solitudine confronto",
+                   sidebarPanel(
+                    sliderInput("num_pre", "Number:",min = 1, max = 20,step=1,value=c(1,20))),
+                    sliderInput("num_post", "Number:",min = 1, max = 20,step=1,value=c(1,20)),
+                  mainPanel(
+                    plotOutput("risultatoPrePlot"),
+                    plotOutput("risultatoPostPlot"),
+                    h5("Domande"),
+                    textOutput("domandeId")
+                  )
+           )
+        )
+                     #textOutput("domandeId")
+)
+           
+          # tabPanel("tabella riportata",
+          #         sidebarPanel(
+          #           radioButtons("inputRadioButton","Scelta :",c("Active","Interested","Enthusiastic")),
+          #         mainPanel(h1("Risultato"),tableOutput("tabellaDiConfronto"))
+          #         )
+
+server <- function(input, output) {
+  #manipolazione dei dati
+  
+ 
+  #------------------------------------------------------------------------- parte server ------------------------------------------------------
+  #funzioni
+  richiama_domanda<-function(minimo,massimo){
+      risul<-c(rep("",20))
+      for(i in minimo:massimo){
+        risul[i]<-colnames(Scala_Solitudine[i+2])
+      }
+      return(risul)
+  }
+  
+  scorrimento_pre<-reactive({
+     risul1<-preparazione_grafico[(preparazione_grafico$indice %in% seq(from=min(input$num_pre),to=max(input$num_pre),by=1)),]
+     risul1
+  })
+  scorrimento_post<-reactive({
+     risul2<-preparazione_grafico_post[(preparazione_grafico_post$indice %in% seq(from=min(input$num_post),to=max(input$num_post),by=1)),]
+     risul2
+  })
+   
+   output$risultatoPrePlot <- renderPlot({
+     
+      grafico_Solitudine<-preparazione_grafico%>%
+      ggplot(data=scorrimento_pre(),mapping= aes(x=indice,y=numero,fill=frequenza))+
+      geom_bar(stat="identity",position = position_dodge())+
+      scale_fill_manual("Frequenza", values = c( "often" = "#D6AF36", "sometimes" = "#A7A7AD","rarely" = "#A77044","never"="#000000"))+
+       theme(axis.title=element_blank())+
+      labs(title="Frequenza per solitudine prima di covid")
+      
+     grafico_Solitudine
+   })  
+ 
+ output$risultatoPostPlot <- renderPlot({
+   
+    grafico_Solitudine_post<-preparazione_grafico_post%>%
+    ggplot(data=scorrimento_post(),mapping= aes(x=indice,y=numero,fill=frequenza))+
+    geom_bar(stat="identity",position = position_dodge())+
+    scale_fill_manual("Frequenza", values = c( "often" = "#D6AF36", "sometimes" = "#A7A7AD","rarely" = "#A77044","never"="#000000"))+
+     theme(axis.title=element_blank())+
+    labs(title="Frequenza per solitudine dopo di covid")
+    
+   grafico_Solitudine_post
+ })  
+
+ output$domandeId <- renderText({
+
+   domanda<-richiama_domanda(min(input$num_pre),max(input$num_pre))
+     domanda
+   })
+
+
+}#server
+
+shinyApp(ui = ui, server = server)
+```
+
+# Conclusioni
+
+ <br><br>
+
+
+
+# Bibiografia
+Come sito di riferimento ho usato Kaggle.com da un dataset pubblico raccolta durante la fase di covid-19

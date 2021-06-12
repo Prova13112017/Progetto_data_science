@@ -887,7 +887,8 @@ I 2 grafici sotto riportato sono le differenze per le 20 domande di solitudine n
     group_by(X1..I.feel.in.tune.with.the.people.around.me)%>%
     summarise(count=n()) %>%
     arrange(desc(count))
-  
+ 
+
   s2<-Scala_Solitudine_pre %>%
     group_by(X2..I.lack.companionship)%>%
     summarise(count=n()) %>%
@@ -1083,8 +1084,29 @@ I 2 grafici sotto riportato sono le differenze per le 20 domande di solitudine n
     group_by(X20..There.are.people.I.can.turn.to)%>%
     summarise(count=n()) %>%
     arrange(desc(count))
-  
-  colonna<-c("Often","Sometimes","Rarely","Never")
+
+colnames(p1)<-c("X1.Mi sento in sintonia con le persone intorno a me","count")
+colnames(p2)<-c("X2.Ho la mancanza della relazione della compagnia","count")
+ colnames(p3)<-c("X3.Non c’è nessuno che lo posso rivolgermi a ","count")
+ colnames(p4)<-c("X4.Non mi sento da solo ","count")
+ colnames(p5)<-c("X5.Mi sento parte di un gruppo di amici","count")
+ colnames(p6)<-c("X6.Ho molto in comune con le persone intorno a me.","count")
+ colnames(p7)<-c("X7.Non sono più vicino a nessuno","count")
+ colnames(p8)<-c("X8.I miei interessi non sono condivisi da chi intorno a me ","count")
+ colnames(p9)<-c("X9.Sono un estroverso a cui mi sento vicino  ","count")
+ colnames(p10)<-c("X10.Ci sono persone che sento vicino a","count")
+ colnames(p11)<-c("X11.Mi sento lasciato fuori/ Mi sento escluso","count")
+ colnames(p12)<-c("X12.Le mie relazioni sociali sono superficiali","count")
+ colnames(p13)<-c("X13.Nessuno mi conosce davvero bene","count")
+ colnames(p14)<-c("X14.Mi sento isolato dagli altri","count")
+ colnames(p15)<-c("X15.Posso trovare compagnia quando lo voglio ","count")
+ colnames(p16)<-c("X16.Ci sono persone che mi comprendono davvero","count")
+ colnames(p17)<-c("X17.Sono infelice di essere così ritirato ","count")
+ colnames(p18)<-c("X18.Le persone sono intorno a me ma non con me","count")
+ colnames(p19)<-c("X19.Ci sono persone che posso parlare a","count")
+ colnames(p20)<-c("X20.Ci sono persone che lo posso rivolgermi ","count")
+ 
+colonna<-c("Often","Sometimes","Rarely","Never")
   Often<-c(rep(0,20))
   Rarely<-c(rep(0,20))
   Sometimes<-c(rep(0,20))
@@ -1108,6 +1130,7 @@ I 2 grafici sotto riportato sono le differenze per le 20 domande di solitudine n
     }
   }
   
+  
   #text mining
   numero_requisito<-num_requisito("X1..There.are.people.who.really.understand.me")
   numero_requisito2<-num_requisito("X2..")
@@ -1119,7 +1142,6 @@ I 2 grafici sotto riportato sono le differenze per le 20 domande di solitudine n
     #passaggio da 20 tabelle in un unica tabella sommario
     dimensione<-dim.data.frame(table$count)
     dimensione<-dimensione[2]#trova la dimensione per ogni singola tabella(sono a loro volta diversi)
-    
       for(i in 1:dimensione){ #trovare per ogni riga fino alla fine se 
         if(as.character(table[i,1]) == "Often" && numero_requisito == num_requisito(colnames(table[1]))){ #trova se c'è una corrispondenza nella tabellina e se il numero della domanda sono gli stessi, se si posso mettere nella cella corrispondente
           nuovaTabella_soli[numero_requisito,i]<-table$count[i] #passa valore 
@@ -1154,7 +1176,12 @@ I 2 grafici sotto riportato sono le differenze per le 20 domande di solitudine n
   nuovaTabella_soli<-sostituzione_pre(s18,18)
   nuovaTabella_soli<-sostituzione_pre(s19,19)
   nuovaTabella_soli<-sostituzione_pre(s20,20)
-
+view(nuovaTabella_soli[19,4])
+   for(j in 1:4){
+     for(i in 1:20){
+     nuovaTabella_soli[i,j]<-trunc((nuovaTabella_soli[i,j]*100)/46)
+    }
+  }
   sostituzione_post <- function(table,numero_requisito){
     #RETURN list
     #passaggio da 20 tabelle in un unica tabella sommario
@@ -1169,6 +1196,8 @@ I 2 grafici sotto riportato sono le differenze per le 20 domande di solitudine n
            nuovaTabella_soli_post[numero_requisito,i]<-table$count[i]
         }else if(as.character(table[i,1])=="Never" && numero_requisito == num_requisito(colnames(table[1]))){ 
             nuovaTabella_soli_post[numero_requisito,i]<-table$count[i]
+        }else{
+          errorCondition("errore")
         }
       }
     return(nuovaTabella_soli_post)
@@ -1194,6 +1223,12 @@ I 2 grafici sotto riportato sono le differenze per le 20 domande di solitudine n
   nuovaTabella_soli_post<-sostituzione_post(p19,19)
   nuovaTabella_soli_post<-sostituzione_post(p20,20)
   
+    for(j in 1:4){
+     for(i in 1:20){
+     nuovaTabella_soli_post[i,j]<-trunc((nuovaTabella_soli_post[i,j]*100)/39)
+    }
+    }
+  
   indice<-c(rep(1:20,4))
   frequenza<-c(rep("often",20),rep("sometimes",20),rep("rarely",20),rep("never",20))
   numero<-c(rep(0,80))
@@ -1210,6 +1245,9 @@ I 2 grafici sotto riportato sono le differenze per le 20 domande di solitudine n
   preparazione_grafico_post[21:40,3] <- nuovaTabella_soli_post[1:20,2]
   preparazione_grafico_post[41:60,3] <- nuovaTabella_soli_post[1:20,3]
   preparazione_grafico_post[61:80,3] <- nuovaTabella_soli_post[1:20,4]  
+  
+  colnames(Scala_Solitudine)<-c("uid","type","X1.Mi sento in sintonia con le persone intorno a me","X2.Ho la mancanza della relazione della compagnia","X3.Non c’è nessuno che lo posso rivolgermi a ","X4.Non mi sento da solo ","X5.Mi sento parte di un gruppo di amici","X6.Ho molto in comune con le persone intorno a me.","X7.Non sono più vicino a nessuno","X8.I miei interessi non sono condivisi da chi intorno a me ","X9.Sono un estroverso a cui mi sento vicino  ","X10.Ci sono persone che sento vicino a","X11.Mi sento lasciato fuori/ Mi sento escluso","X12.Le mie relazioni sociali sono superficiali","X13.Nessuno mi conosce davvero bene","X14.Mi sento isolato dagli altri","X15.Posso trovare compagnia quando lo voglio ","X16.Ci sono persone che mi comprendono davvero","X17.Sono infelice di essere così ritirato ","X18.Le persone sono intorno a me ma non con me","X19.Ci sono persone che posso parlare a","X20.Ci sono persone che lo posso rivolgermi ")
+
   
   grafico_Solitudine<-preparazione_grafico%>%
     ggplot(aes(x=indice,numero,fill=frequenza))+
@@ -1259,8 +1297,6 @@ ui<-fluidPage(theme = shinytheme("superhero"),
 
 server <- function(input, output) {
   #manipolazione dei dati
-  
- 
   #------------------------------------------------------------------------- parte server ------------------------------------------------------
   #funzioni per manipolazione della stringa per la domanda di solitudine 
   richiama_domanda<-function(minimo,massimo){
@@ -1280,7 +1316,7 @@ server <- function(input, output) {
      risul2
   })
    
-   output$risultatoPrePlot <- renderPlot({
+  output$risultatoPrePlot <- renderPlot({
       grafico_Solitudine<-preparazione_grafico%>%
       ggplot(data=scorrimento_pre(),mapping= aes(x=indice,y=numero,fill=frequenza))+
       geom_bar(stat="identity",position = position_dodge())+

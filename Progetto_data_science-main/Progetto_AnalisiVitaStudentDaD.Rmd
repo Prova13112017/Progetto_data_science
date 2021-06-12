@@ -1,5 +1,5 @@
 ---
-title: "Analisi sulla ditatica a distanza degli studenti durante la pandemia"
+title: "Analisi sulla didattica a distanza degli studenti durante la pandemia"
 author: "JiaPing Huang"
 date: "28/1/2021"
 
@@ -41,10 +41,10 @@ library(knitr)
 
 ## Introduzione 
   <h3>
-  Dopo l'imprevisto della crisi di pandemia nel 2019 ha cambiato la nostra vita quotidiana di tutto il mondo in vari ambiti ,uno dei quali che stiamo convivendo attualmente è la ditatica a distanza per tutti gli studenti.
+  Dopo l'imprevisto della crisi di pandemia nel 2019 ha cambiato la nostra vita quotidiana di tutto il mondo in vari ambiti ,uno dei quali che stiamo convivendo attualmente è la didattica a distanza per tutti gli studenti.
   <br>
-  In questo progetto analiziamo in vari aspetti interessanti degli studenti da 48 studenti in 10 settimane 
-  </h3>
+  In questo progetto analizziamo in vari aspetti interessanti degli studenti da 48 studenti in 10 settimane 
+ </h3>
   <br><br>
   <img src= "Dad_introduzione.jpg"/>
 <br><br><br>
@@ -69,12 +69,13 @@ Sensazione_Sul_Dad= read.csv("panas.csv")
 <h4>
 La tabella riportato sotto in esempio sono cosi come è quello estratto direttamente dal dataset senza nessun manipolazione.<br>
 In ogni riga ci sono diversi utenti e per ogni colonna ci sono le domande riferite alle caratteristiche dell'utente.<br>
-Dove ciasun utente si autovaluta in base al proprio valutazione,in 5 livelli diversi che sono :<br>
--fortemente disacordo,<br>
--debolmente disacordo,<br>
--tra disacordo e accordo,<br>
+Dove ogni utente si autovaluta in base al proprio valutazione ,in 5 livelli diversi che sono :<br>
+-fortemente disaccordo,<br>
+-debolmente disaccordo,<br>
+-tra disaccordo e accordo,<br>
 -debolmente accordo,<br>
 -fortemente accordo.<br>
+
 <h4>
 
 <br>
@@ -89,7 +90,7 @@ kable(df1, format = "markdown")
 <h4>
 La tabella riportato sotto in esempio sono cosi come è quello estratto direttamente dal dataset senza nessun manipolazione.<br>
 In ogni riga ci sono diversi utenti e per ogni colonna ci sono le domande riferite alle domande per il livello di solitudine.<br>
-Dove ciasun utente si autovaluta in base al proprio valutazione,in 5 livelli diversi che sono :<br>
+Dove ogni utente si autovaluta in base al proprio valutazione ,in 5 livelli diversi che sono :<br>
 -spesso,<br>
 -di solito,<br>
 -qualche volta,<br>
@@ -100,6 +101,7 @@ Dove ciasun utente si autovaluta in base al proprio valutazione,in 5 livelli div
 <br>
 
 Esempio di colonne di dataset per le domande di solitudine:
+
 ```{r ,echo= FALSE}
 df2<-Scala_Solitudine %>%
   head(5)
@@ -109,13 +111,13 @@ kable(df2, format = "markdown")
 <br><br>
 <h4>
 La tabella riportato sotto in esempio sono cosi come è quello estratto direttamente dal dataset senza nessun manipolazione.<br>
-In ogni riga ci sono diversi utenti e per ogni colonna ci sono diversi emozioni ed sentimenti durante l'esperienza della ditatica a distanza.<br>
+In ogni riga ci sono diversi utenti e per ogni colonna ci sono diversi emozioni ed sentimenti durante l'esperienza della didattica a distanza.<br>
 Dove ciasun utente si autovaluta in base al proprio sentimento,in 5 livelli diversi : 1 il più basso fino 5 il più alto .<br>
 </h4>
 
 <br>
 
-Esempio di colonne di dataset per le domande di sentimento per la ditadica a distanza:
+Esempio di colonne di dataset per le domande di sentimento per la didattica a distanza:
 ```{r ,echo= FALSE}
 df3<-Sensazione_Sul_Dad %>%
   head(5)
@@ -140,14 +142,16 @@ x3<-cerca_domanda(3)
 #kable(x3,format = "markdown")
 ```
 <br><br>
+
 <h4>
 Dalla tabella autostima prendiamo la notazione di alcuni valutazione e mettiamo in confronto la loro somma della valutazione per vedere andamento in generale.<br>
 -il confronto :se sei un chiacchierone <br>
--il confronto :se sei uno che ende di andare in fallimenti con altri<br>
+-il confronto :se sei uno che tende di andare in fallimenti con altri<br>
 -il confronto :se sei energetico<br>
--il confronto :se sei preocupato tanto<br>
+-il confronto :se sei preoccupato tanto<br>
 -il confronto :tendi a diventare pigro<br>
 </h4>
+
 
 <br><br><br>
 
@@ -241,7 +245,7 @@ colnames(AutoStima_Caratteristica_Questione23_post) <- c("tende_a_diventare_pigr
 ```
 
 <br>
-Preparazione il graffico a barre:
+Preparazione del grafico a barre:
 ```{r,message=FALSE,warning=FALSE,out.width="100%"}
 #preparazione per il grafico a barre
 
@@ -266,7 +270,6 @@ q1_post<-q1_post[,1]/39
 q2_post<-q2_post[,1]/39
 q19_post<-q19_post[,1]/39
 q23_post<-q23_post[,1]/39
-
 
 
 domande<-c("Sono_chiacchierone_prima","Sono_chiacchierone_dopo","tende_di_andare_in_fallimenti_con_altri_prima","tende_di_andare_in_fallimenti_con_altri_dopo","se_sei_energetico_prima","se_sei_energetico_dopo","se_sei_preocupato_tanto_prima","se_sei_preocupato_tanto_dopo","tende_a_diventare_pigro_prima", "tende_a_diventare_pigro_dopo")
@@ -316,7 +319,8 @@ nuovaTabella<- nuovaTabella [,c(1,3,2,6,4,5)]#cambiato l'ordine in modo decresen
 ## Emozioni durante la fase di DaD:{.tabset .tabset-fade .tabset-pills}
 
 
-Un esempio per il confronto per l'esperienza di ditatica a distanza:
+Un esempio per il confronto per l'esperienza di didatica a distanza:
+
 ```{r,message=FALSE,warning=FALSE,out.width="100%"}
 Sensazione_Sul_Dad_prima=Sensazione_Sul_Dad %>%
                           filter(type=="pre") 
@@ -325,10 +329,10 @@ Sensazione_Sul_Dad_dopo=Sensazione_Sul_Dad %>%
                           filter(type=="post")
   
 #1
-  #contare quante sono le persone che interessano prima di provare la ditatica a distanza 
+  #contare quante sono le persone che interessano prima di provare la didatticaica a distanza 
   risultato_interesting_1= Sensazione_Sul_Dad_prima %>%
     group_by(Interested)%>%
-    summarise(count=n()) %>%
+    summarise(count=n())%>%
    filter(count<100)%>%
     mutate(type="pre")%>%
     arrange(desc(Interested))
@@ -338,7 +342,7 @@ Sensazione_Sul_Dad_dopo=Sensazione_Sul_Dad %>%
   kable(risultato_interesting_1,format = "markdown")
   
   
-  #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+  #quante persone invece hanno valutato dopo aver provato la didatticaica a distanza 
   risultato_interesting_2= Sensazione_Sul_Dad_dopo %>%
     group_by(Interested)%>%
     summarise(count=n()) %>%
@@ -353,12 +357,12 @@ risultato_interesting_2 = risultato_interesting_2[,c(3,1,2)]
   #坚强、内疚、害怕、敌对、热情、骄傲、易怒、警惕、有灵感、紧张、坚定、专心、紧张、积极、恐惧
 ```
 NB: nella seconda parte manca alcune valutazione , di cui 7 hanno abbandonato la valutazione .
-00
-```{r,message=FALSE,warning=FALSE,out.width="100%"}
+NB: i valori sono in percentuale per facilitare il confronto.
+```{r,message=FALSE,warning=FALSE,out.width="100%,out.height= 100%"}
 
 ui<-fluidPage(theme = shinytheme("cerulean"),
        navbarPage(
-         "Valutazione prima e dopo della ditatica a distanza",
+         "Valutazione prima e dopo della didatticaica a distanza",
          tabPanel("Positivo",
                   sidebarPanel(
                     selectInput("EmozioneSelezionato","Input:",c("Interested","Active","Enthusiastic")),
@@ -400,162 +404,340 @@ server <- function(input, output,session) {
  
   emozionePositive <- eventReactive(input$EmozioneSelezionato,{
     if(input$EmozioneSelezionato == "Interested"){
-          #contare quante sono le persone che interessano prima di provare la ditatica a distanza 
+          #contare quante sono le persone che interessano prima di provare la didatticaica a distanza 
           risultato_interesting_1= Sensazione_Sul_Dad_prima %>%
             group_by(Interested)%>%
-            summarise(count=n()) %>%
-           filter(count<100)%>%
+            summarise(count=n())
+          
+          #calcola la frequenza relativa 
+          frequenza_relativa<-trunc((risultato_interesting_1[,2]/46)*100)
+          
+          #sostituisce il nome della colonna in nome frequenza_relativa
+          colnames(frequenza_relativa)<-"frequenza_relativa"
+         
+          #crea la tabella totale
+          risultato_interesting_1<-data.frame(risultato_interesting_1,frequenza_relativa)
+  
+          #aggiunge i campi per precedente e il successivo
+          risultato_interesting_1 = risultato_interesting_1 %>%
             mutate(type="pre")%>%
             arrange(desc(Interested))
-        
-          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+         
+       
+          view(risultato_interesting_1)
+         
+          
+          #quante persone invece hanno valutato dopo aver provato la didatticaica a distanza 
           risultato_interesting_2= Sensazione_Sul_Dad_dopo %>%
             group_by(Interested)%>%
-            summarise(count=n()) %>%
-           filter(count<100)%>%
-             mutate(type="post")%>%
+            summarise(count=n())
+          
+          #calcola la frequenza relativa 
+          frequenza_relativa<-trunc((risultato_interesting_2[,2]/39)*100)
+          
+          #sostituisce il nome della colonna in nome frequenza_relativa
+          colnames(frequenza_relativa)<-"frequenza_relativa"
+         
+          #crea la tabella totale
+          risultato_interesting_2<-data.frame(risultato_interesting_2,frequenza_relativa)
+  
+          #aggiunge i campi per precedente e il successivo
+          risultato_interesting_2 = risultato_interesting_2 %>%
+            mutate(type="post")%>%
             arrange(desc(Interested))
-        
+         
+          #unisce le 2 tabelle
          preparazione_table= bind_rows(risultato_interesting_1,risultato_interesting_2)
-         view(preparazione_table)
-        graffico_positivo_1=ggplot(data=preparazione_table, aes(x=Interested,y=count,fill=type))+
+       
+        #crea la tabella ,NB in base alla freq relativa
+        graffico_positivo_1=ggplot(data=preparazione_table, aes(x=Interested,y=frequenza_relativa,fill=type))+
           geom_bar(stat="identity", position=position_dodge())+
           geom_text(aes(label=count), vjust=1.6, color="white",position = position_dodge(0.9), size=3.5)+
            scale_fill_brewer(palette="Paired")+
           labs(title="Interesting pre and post")+
           theme_minimal()
+        
         graffico_positivo_1
         
     }else if(input$EmozioneSelezionato=="Active"){
-        risultato_active_1= Sensazione_Sul_Dad_prima %>%
+       #contare quante sono le persone che attivo prima di provare la didatticaica a distanza 
+          risultato_active_1= Sensazione_Sul_Dad_prima %>%
             group_by(Active)%>%
-            summarise(count=n()) %>%
-           filter(count<100)%>%
+            summarise(count=n())
+          
+          #calcola la frequenza relativa 
+          frequenza_relativa<-trunc((risultato_active_1[,2]/46)*100)
+          
+          #sostituisce il nome della colonna in nome frequenza_relativa
+          colnames(frequenza_relativa)<-"frequenza_relativa"
+         
+          #crea la tabella totale
+          risultato_active_1<-data.frame(risultato_active_1,frequenza_relativa)
+  
+          #aggiunge i campi per precedente e il successivo
+          risultato_active_1 = risultato_active_1 %>%
             mutate(type="pre")%>%
             arrange(desc(Active))
-          
-          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+         
+       
+          view(risultato_active_1)
+         
+            #quante persone invece hanno valutato dopo aver provato la didatticaica a distanza 
           risultato_active_2= Sensazione_Sul_Dad_dopo %>%
             group_by(Active)%>%
-            summarise(count=n()) %>%
-           filter(count<100)%>%
-             mutate(type="post")%>%
-            arrange(desc(Active))
-        
-         preparazione_table= bind_rows(risultato_active_1,risultato_active_2)
+            summarise(count=n())
+          
+          #calcola la frequenza relativa 
+          frequenza_relativa<-trunc((risultato_active_2[,2]/39)*100)
+          
+          #sostituisce il nome della colonna in nome frequenza_relativa
+          colnames(frequenza_relativa)<-"frequenza_relativa"
          
-        graffico_positivo_2=ggplot(data=preparazione_table, aes(x=Active,y=count,fill=type))+
+          #crea la tabella totale
+          risultato_active_2<-data.frame(risultato_active_2,frequenza_relativa)
+  
+          #aggiunge i campi per precedente e il successivo
+          risultato_active_2 = risultato_active_2 %>%
+            mutate(type="post")%>%
+            arrange(desc(Active))
+         
+          #unisce le 2 tabelle
+         preparazione_table= bind_rows(risultato_active_1,risultato_active_2)
+       
+        #crea la tabella ,NB in base alla freq relativa
+        graffico_positivo_2=ggplot(data=preparazione_table, aes(x=Active,y=frequenza_relativa,fill=type))+
           geom_bar(stat="identity", position=position_dodge())+
           geom_text(aes(label=count), vjust=1.6, color="white",position = position_dodge(0.9), size=3.5)+
            scale_fill_brewer(palette="Paired")+
-          labs(title="Interesting pre and post")+
+          labs(title="Active pre and post")+
           theme_minimal()
+        
         graffico_positivo_2
-    }else{
-      risultato_enthusiastic_1= Sensazione_Sul_Dad_prima %>%
+    }else {
+     #contare quante ono le persone che attivo prima di provare la didatticaica a distanza 
+          risultato_enthusiastic_1= Sensazione_Sul_Dad_prima %>%
             group_by(Enthusiastic)%>%
-            summarise(count=n()) %>%
-           filter(count<100)%>%
+            summarise(count=n())
+          
+          #calcola la frequenza relativa 
+          frequenza_relativa<-trunc((risultato_enthusiastic_1[,2]/46)*100)
+          
+          #sostituisce il nome della colonna in nome frequenza_relativa
+          colnames(frequenza_relativa)<-"frequenza_relativa"
+         
+          #crea la tabella totale
+          risultato_enthusiastic_1<-data.frame(risultato_enthusiastic_1,frequenza_relativa)
+  
+          #aggiunge i campi per precedente e il successivo
+          risultato_enthusiastic_1 = risultato_enthusiastic_1 %>%
             mutate(type="pre")%>%
             arrange(desc(Enthusiastic))
+         
+       
+          view(risultato_enthusiastic_1)
+         
           
-          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+          #quante persone invece hanno valutato dopo aver provato la didattica a distanza 
           risultato_enthusiastic_2= Sensazione_Sul_Dad_dopo %>%
             group_by(Enthusiastic)%>%
-            summarise(count=n()) %>%
-           filter(count<100)%>%
-             mutate(type="post")%>%
-            arrange(desc(Enthusiastic))
-        
-         preparazione_table= bind_rows(risultato_enthusiastic_1,risultato_enthusiastic_2)
+            summarise(count=n())
+          
+          #calcola la frequenza relativa 
+          frequenza_relativa<-trunc((risultato_enthusiastic_2[,2]/39)*100)
+          
+          #sostituisce il nome della colonna in nome frequenza_relativa
+          colnames(frequenza_relativa)<-"frequenza_relativa"
          
-        graffico_positivo_3=ggplot(data=preparazione_table, aes(x=Enthusiastic,y=count,fill=type))+
+          #crea la tabella totale
+          risultato_enthusiastic_2<-data.frame(risultato_enthusiastic_2,frequenza_relativa)
+  
+          #aggiunge i campi per precedente e il successivo
+          risultato_enthusiastic_2 = risultato_enthusiastic_2 %>%
+            mutate(type="post")%>%
+            arrange(desc(Enthusiastic))
+         
+          #unisce le 2 tabelle
+         preparazione_table= bind_rows(risultato_enthusiastic_1,risultato_enthusiastic_2)
+       
+        #crea la tabella ,NB in base alla freq relativa
+        graffico_positivo_3=ggplot(data=preparazione_table, aes(x=Enthusiastic,y=frequenza_relativa,fill=type))+
           geom_bar(stat="identity", position=position_dodge())+
           geom_text(aes(label=count), vjust=1.6, color="white",position = position_dodge(0.9), size=3.5)+
            scale_fill_brewer(palette="Paired")+
-          labs(title="Interesting pre and post")+
+          labs(title="Ethusiastic pre and post")+
           theme_minimal()
+        
         graffico_positivo_3
     }
   })
   
   emozioneNegative <- eventReactive(input$EmozioneSelezionato2,{
     if(input$EmozioneSelezionato2 == "Scared"){
-          #contare quante sono le persone che interessano prima di provare la ditatica a distanza 
+        #contare quante sono le persone che interessano prima di provare la didattica a distanza 
           risultato_scared_1= Sensazione_Sul_Dad_prima %>%
             group_by(Scared)%>%
-            summarise(count=n()) %>%
-           filter(count<100)%>%
+            summarise(count=n())
+          
+          #calcola la frequenza relativa 
+          frequenza_relativa<-trunc((risultato_scared_1[,2]/46)*100)
+          
+          #sostituisce il nome della colonna in nome frequenza_relativa
+          colnames(frequenza_relativa)<-"frequenza_relativa"
+         
+          #crea la tabella totale
+          risultato_scared_1<-data.frame(risultato_scared_1,frequenza_relativa)
+  
+          #aggiunge i campi per precedente e il successivo
+          risultato_scared_1 = risultato_scared_1 %>%
             mutate(type="pre")%>%
             arrange(desc(Scared))
+         
+       
+          view(risultato_scared_1)
+         
           
-          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+          #quante persone invece hanno valutato dopo aver provato la didattica a distanza 
           risultato_scared_2= Sensazione_Sul_Dad_dopo %>%
             group_by(Scared)%>%
-            summarise(count=n()) %>%
-           filter(count<100)%>%
-             mutate(type="post")%>%
-            arrange(desc(Scared))
-        
-         preparazione_table= bind_rows(risultato_scared_1,risultato_scared_2)
+            summarise(count=n())
+          
+          #calcola la frequenza relativa 
+          frequenza_relativa<-trunc((risultato_scared_2[,2]/39)*100)
+          
+          #sostituisce il nome della colonna in nome frequenza_relativa
+          colnames(frequenza_relativa)<-"frequenza_relativa"
          
-        graffico_negativo_1=ggplot(data=preparazione_table, aes(x=Scared,y=count,fill=type))+
+          #crea la tabella totale
+          risultato_scared_2<-data.frame(risultato_scared_2,frequenza_relativa)
+  
+          #aggiunge i campi per precedente e il successivo
+          risultato_scared_2 = risultato_scared_2 %>%
+            mutate(type="post")%>%
+            arrange(desc(Scared))
+         
+          #unisce le 2 tabelle
+         preparazione_table= bind_rows(risultato_scared_1,risultato_scared_2)
+       
+        #crea la tabella ,NB in base alla freq relativa
+        graffico_negativo_1=ggplot(data=preparazione_table, aes(x=Scared,y=frequenza_relativa,fill=type))+
           geom_bar(stat="identity", position=position_dodge())+
           geom_text(aes(label=count), vjust=1.6, color="white",position = position_dodge(0.9), size=3.5)+
            scale_fill_brewer(palette="Paired")+
           labs(title="Scared pre and post")+
           theme_minimal()
         
-      graffico_negativo_1        
+        graffico_negativo_1
+              
     }else if(input$EmozioneSelezionato2=="Upset"){
-        risultato_upset_1= Sensazione_Sul_Dad_prima %>%
+      #contare quante sono le persone che interessano prima di provare la didattica a distanza 
+          risultato_upset_1= Sensazione_Sul_Dad_prima %>%
             group_by(Upset)%>%
-            summarise(count=n()) %>%
-           filter(count<100)%>%
+            summarise(count=n())
+          
+          #calcola la frequenza relativa 
+          frequenza_relativa<-trunc((risultato_upset_1[,2]/46)*100)
+          
+          #sostituisce il nome della colonna in nome frequenza_relativa
+          colnames(frequenza_relativa)<-"frequenza_relativa"
+         
+          #crea la tabella totale
+          risultato_upset_1<-data.frame(risultato_upset_1,frequenza_relativa)
+  
+          #aggiunge i campi per precedente e il successivo
+          risultato_upset_1 = risultato_upset_1 %>%
             mutate(type="pre")%>%
             arrange(desc(Upset))
+         
+       
+          view(risultato_upset_1)
+         
           
-          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+          #quante persone invece hanno valutato dopo aver provato la didattica a distanza 
           risultato_upset_2= Sensazione_Sul_Dad_dopo %>%
             group_by(Upset)%>%
-            summarise(count=n()) %>%
-           filter(count<100)%>%
-             mutate(type="post")%>%
-            arrange(desc(Upset))
-        
-         preparazione_table= bind_rows(risultato_upset_1,risultato_upset_2)
+            summarise(count=n())
+          
+          #calcola la frequenza relativa 
+          frequenza_relativa<-trunc((risultato_upset_2[,2]/39)*100)
+          
+          #sostituisce il nome della colonna in nome frequenza_relativa
+          colnames(frequenza_relativa)<-"frequenza_relativa"
          
-        graffico_negativo_2=ggplot(data=preparazione_table, aes(x=Upset,y=count,fill=type))+
+          #crea la tabella totale
+          risultato_upset_2<-data.frame(risultato_upset_2,frequenza_relativa)
+  
+          #aggiunge i campi per precedente e il successivo
+          risultato_upset_2 = risultato_upset_2 %>%
+            mutate(type="post")%>%
+            arrange(desc(Upset))
+         
+          #unisce le 2 tabelle
+         preparazione_table= bind_rows(risultato_upset_1,risultato_upset_2)
+       
+        #crea la tabella ,NB in base alla freq relativa
+        graffico_negativo_2=ggplot(data=preparazione_table, aes(x=Upset,y=frequenza_relativa,fill=type))+
           geom_bar(stat="identity", position=position_dodge())+
           geom_text(aes(label=count), vjust=1.6, color="white",position = position_dodge(0.9), size=3.5)+
            scale_fill_brewer(palette="Paired")+
           labs(title="Upset pre and post")+
           theme_minimal()
+        
         graffico_negativo_2
+          
     }else{
-      risultato_distressed_1= Sensazione_Sul_Dad_prima %>%
+       #contare quante sono le persone che interessano prima di provare la didattica a distanza 
+          risultato_distressed_1= Sensazione_Sul_Dad_prima %>%
             group_by(Distressed)%>%
-            summarise(count=n()) %>%
-           filter(count<100)%>%
+            summarise(count=n())
+          
+          #calcola la frequenza relativa 
+          frequenza_relativa<-trunc((risultato_distressed_1[,2]/46)*100)
+          
+          #sostituisce il nome della colonna in nome frequenza_relativa
+          colnames(frequenza_relativa)<-"frequenza_relativa"
+         
+          #crea la tabella totale
+          risultato_distressed_1<-data.frame(risultato_distressed_1,frequenza_relativa)
+  
+          #aggiunge i campi per precedente e il successivo
+          risultato_distressed_1 = risultato_distressed_1 %>%
             mutate(type="pre")%>%
             arrange(desc(Distressed))
+         
+       
+          view(risultato_distressed_1)
+         
           
-          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza 
+          #quante persone invece hanno valutato dopo aver provato la didattica a distanza 
           risultato_distressed_2= Sensazione_Sul_Dad_dopo %>%
             group_by(Distressed)%>%
-            summarise(count=n()) %>%
-           filter(count<100)%>%
-             mutate(type="post")%>%
-            arrange(desc(Distressed))
-        
-         preparazione_table= bind_rows(risultato_distressed_1,risultato_distressed_2)
+            summarise(count=n())
+          
+          #calcola la frequenza relativa 
+          frequenza_relativa<-trunc((risultato_distressed_2[,2]/39)*100)
+          
+          #sostituisce il nome della colonna in nome frequenza_relativa
+          colnames(frequenza_relativa)<-"frequenza_relativa"
          
-        graffico_negativo_3=ggplot(data=preparazione_table, aes(x=Distressed,y=count,fill=type))+
+          #crea la tabella totale
+          risultato_distressed_2<-data.frame(risultato_distressed_2,frequenza_relativa)
+  
+          #aggiunge i campi per precedente e il successivo
+          risultato_distressed_2 = risultato_distressed_2 %>%
+            mutate(type="post")%>%
+            arrange(desc(Distressed))
+         
+          #unisce le 2 tabelle
+         preparazione_table= bind_rows(risultato_distressed_1,risultato_distressed_2)
+       
+        #crea la tabella ,NB in base alla freq relativa
+        graffico_negativo_3=ggplot(data=preparazione_table, aes(x=Distressed,y=frequenza_relativa,fill=type))+
           geom_bar(stat="identity", position=position_dodge())+
           geom_text(aes(label=count), vjust=1.6, color="white",position = position_dodge(0.9), size=3.5)+
            scale_fill_brewer(palette="Paired")+
           labs(title="Distressed pre and post")+
           theme_minimal()
+        
         graffico_negativo_3
     }
   })
@@ -589,7 +771,7 @@ server <- function(input, output,session) {
       return ();
     }else{
       if(input$inputRadioButton == "Interested"){
-       #contare quante sono le persone che interessano prima di provare la ditatica a distanza
+       #contare quante sono le persone che interessano prima di provare la didattica a distanza
           risultato_interesting_1= Sensazione_Sul_Dad_prima %>%
             group_by(Interested)%>%
             summarise(count=n()) %>%
@@ -597,7 +779,7 @@ server <- function(input, output,session) {
             mutate(type="pre")%>%
             arrange(desc(Interested))
 
-          #quante persone invece hanno valutato dopo aver provato la ditatica a distanza
+          #quante persone invece hanno valutato dopo aver provato la didattica a distanza
           risultato_interesting_2= Sensazione_Sul_Dad_dopo %>%
             group_by(Interested)%>%
             summarise(count=n()) %>%
@@ -614,7 +796,7 @@ server <- function(input, output,session) {
 
         }else{
           if(input$inputRadioButton == "Active"){
-          #contare quante sono le persone che interessano prima di provare la ditatica a distanza
+          #contare quante sono le persone che interessano prima di provare la didattica a distanza
             risultato_active_1= Sensazione_Sul_Dad_prima %>%
               group_by(Active)%>%
               summarise(count=n()) %>%
@@ -622,7 +804,7 @@ server <- function(input, output,session) {
               mutate(type="pre")%>%
               arrange(desc(Active))
 
-            #quante persone invece hanno valutato dopo aver provato la ditatica a distanza
+            #quante persone invece hanno valutato dopo aver provato la didattica a distanza
             risultato_active_2= Sensazione_Sul_Dad_dopo %>%
               group_by(Active)%>%
               summarise(count=n()) %>%
@@ -637,7 +819,7 @@ server <- function(input, output,session) {
               return (riassunto2)
           }else{
               if(input$inputRadioButton=="Enthusiastic"){
-                #contare quante sono le persone che interessano prima di provare la ditatica a distanza
+                #contare quante sono le persone che interessano prima di provare la didattica a distanza
                 risultato_enthusiastic_1= Sensazione_Sul_Dad_prima %>%
                   group_by(Enthusiastic)%>%
                   summarise(count=n()) %>%
@@ -645,7 +827,7 @@ server <- function(input, output,session) {
                   mutate(type="pre")%>%
                   arrange(desc(Enthusiastic))
   
-                #quante persone invece hanno valutato dopo aver provato la ditatica a distanza
+                #quante persone invece hanno valutato dopo aver provato la didattica a distanza
                 risultato_enthusiastic_2= Sensazione_Sul_Dad_dopo %>%
                   group_by(Enthusiastic)%>%
                   summarise(count=n()) %>%
@@ -688,8 +870,7 @@ shinyApp(ui = ui, server = server)
 
 ## Scala di solitudine:{.tabset .tabset-fade .tabset-pills}
 
-I 2 grafici sotto riportato sono le diferenze per le 20 domande di solitudine nel periodo pre covid e post covid.
-
+I 2 grafici sotto riportato sono le differenze per le 20 domande di solitudine nel periodo pre-covid e post covid.
 ```{r ,echo= FALSE}
 #manipolazione della tabella di solitudine
 
@@ -1045,20 +1226,7 @@ I 2 grafici sotto riportato sono le diferenze per le 20 domande di solitudine ne
     labs(title="Frequenza per solitudine post")
   
   grid.arrange(grafico_Solitudine,grafico_Solitudine_post)
-  fillPage(
-  tags$style(type = "text/css",
-    ".half-fill { width: 50%; height: 100%; }",
-    "#one { float: left; background-color: #ddddff; }",
-    "#two { float: right; background-color: #ccffcc; }"
-  ),
-  div(id = "one", class = "half-fill",
-    "Ldsdsadasdsadsdasdasdsdasdas"
-  ),
-  div(id = "two", class = "half-fill",
-    "Rigdasdasdsadsadasdasasdasaf"
-  ),
-  padding = 10
-)
+  
 ```
 
 
@@ -1066,18 +1234,19 @@ I 2 grafici sotto riportato sono le diferenze per le 20 domande di solitudine ne
  
 ui<-fluidPage(theme = shinytheme("superhero"),
         navbarPage(
-         "Valutazione prima e dopo della ditatica a distanza",
+         "Valutazione prima e dopo per la didattica a distanza",
          tabPanel("Solitudine confronto",
                    sidebarPanel(
-                    sliderInput("num_pre", "Number:",min = 1, max = 20,step=1,value=c(1,20))),
+                    h5("Domande"),
+                    textOutput("domandeId"),
+                    sliderInput("num_pre", "Number:",min = 1, max = 20,step=1,value=c(1,20)),
                     sliderInput("num_post", "Number:",min = 1, max = 20,step=1,value=c(1,20)),
+                    ),
                   mainPanel(
                     plotOutput("risultatoPrePlot"),
-                    plotOutput("risultatoPostPlot"),
-                    h5("Domande"),
-                    textOutput("domandeId")
+                    plotOutput("risultatoPostPlot")
                   )
-           )
+          )
         )
                      #textOutput("domandeId")
 )
@@ -1093,7 +1262,7 @@ server <- function(input, output) {
   
  
   #------------------------------------------------------------------------- parte server ------------------------------------------------------
-  #funzioni
+  #funzioni per manipolazione della stringa per la domanda di solitudine 
   richiama_domanda<-function(minimo,massimo){
       risul<-c(rep("",20))
       for(i in minimo:massimo){
@@ -1149,8 +1318,17 @@ shinyApp(ui = ui, server = server)
  
 ## Conclusioni
 
-Da questi analisi si nota che sono scesci in generare 
- <br><br><br>
+Da questi analisi si genera le seguenti conclusione :<br>
+  -1. Con l'andamento della pandemia gli studenti sono suddivisi in 2 grande categorie estreme, da un lato ci sono quelli più bravi che riescono a svolgere il proprio lavoro anche senza una collettività invece altri studenti meno bravi si sono rimasti indietro a causa dagli vari motivi. <br>
+  -2.La positività in generale degli studenti per lo studio sono calati il tempo.<br>
+  A causa di vari motivi, 
+  come lo stress davanti a un dispositivo elettronico per lunghe ore,<br>
+  perdere la concentrazione durante la lezione,<br>
+  difficile regolarizzare il ritmo di lavoro a causa dell'ambiente,<br>
+  la comunicazione efficiente con altri colleghi del corso ecc..
+  
+
+  <br><br><br>
 
 ## Bibiografia
 

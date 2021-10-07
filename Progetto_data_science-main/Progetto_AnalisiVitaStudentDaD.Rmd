@@ -1,7 +1,7 @@
 ---
 title: "Analisi sulla didattica a distanza degli studenti durante la pandemia"
 author: "JiaPing Huang"
-date: "28/1/2021"
+date: "15/6/2021"
 
 output:
   html_document:
